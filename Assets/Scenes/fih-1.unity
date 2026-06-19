@@ -748,12 +748,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c8dd5bd072ad34897a18dbc63c0e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  cameraTransform: {fileID: 825066492}
   walkSpeed: 5
   sprintSpeed: 10
+  rotationSpeed: 10
   jumpHeight: 2
   gravity: -9.8
-  shouldFaceMoveDirection: 1
+  cameraTransform: {fileID: 825066492}
 --- !u!143 &684390519
 CharacterController:
   m_ObjectHideFlags: 0
