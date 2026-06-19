@@ -21,11 +21,18 @@ public class WorldCrossHairController : MonoBehaviour
 
         // Locks the hidden cursor to the exact center of the game screen so it cannot drift off-screen.
         Cursor.lockState = CursorLockMode.Locked;
+
+        // FIXED: Start with the crosshair hidden by default
+        SetCrosshairVisibility(false);
+
     }
 
     // Runs automatically every frame to recalculate the 3D crosshair position.
     void Update()
     {
+        //If the crosshair is turned off, skip all the heavy raycast math entirely
+        if (!crosshairUI.gameObject.activeSelf) return;
+
         // 1. Find the literal absolute center coordinate of your game screen in pixels.
         Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
 
@@ -59,5 +66,14 @@ public class WorldCrossHairController : MonoBehaviour
 
         // 4. Update the actual 3D transformation location of the world canvas crosshair UI element.
         crosshairUI.position = targetPos;
+    }
+
+    //Added public method so the CameraSwitcher script can turn the crosshair on and off
+    public void SetCrosshairVisibility(bool visible)
+    {
+        if (crosshairUI != null)
+        {
+            crosshairUI.gameObject.SetActive(visible);
+        }
     }
 }
