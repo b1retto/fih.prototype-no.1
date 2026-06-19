@@ -563,7 +563,8 @@ MonoBehaviour:
   inputAxisController: {fileID: 825066488}
   mainCamera: {fileID: 330585545}
   player: {fileID: 684390518}
-  crosshairUI: {fileID: 0}
+  crosshairUI: {fileID: 2074026624}
+  crosshairController: {fileID: 2074026628}
 --- !u!4 &628078065
 Transform:
   m_ObjectHideFlags: 0
@@ -1318,7 +1319,7 @@ MonoBehaviour:
   Damping: {x: 0.1, y: 0.5, z: 0.3}
   ShoulderOffset: {x: 0.7, y: 0.2, z: 0}
   VerticalArmLength: 0.4
-  CameraSide: 1.760866e-32
+  CameraSide: 0.9999996
   CameraDistance: 1
   AvoidObstacles:
     Enabled: 0
@@ -1381,7 +1382,7 @@ Transform:
   m_GameObject: {fileID: 1562939084}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0.7, y: 1.6, z: -1}
+  m_LocalPosition: {x: 0.6999994, y: 1.6, z: -1}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
