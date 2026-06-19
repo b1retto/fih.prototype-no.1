@@ -6,10 +6,12 @@ public class PlayerController : MonoBehaviour
     // ==================== VALUES & SETTINGS ====================
     #region Values
     [Header("Movement Settings")]
+    [SerializeField] private Transform cameraTransform;
     [SerializeField] private float walkSpeed = 5f;      // How fast the player walks (units per second)
     [SerializeField] private float sprintSpeed = 10f;   // How fast the player sprints (units per second)
     [SerializeField] private float jumpHeight = 2f;     // How high the player can jump (in units)
     [SerializeField] private float gravity = -9.8f;     // Gravity force pulling player down (negative = downward)
+    [SerializeField] private bool shouldFaceMoveDirection = false;
 
     // -------- PRIVATE VARIABLES --------
     private CharacterController controller; // Unity component that handles player movement and collision
@@ -17,7 +19,6 @@ public class PlayerController : MonoBehaviour
     private Vector3 velocity;               // Stores the player's current velocity (speed and direction)
     private bool isSprinting = false;       // Tracks whether the player is currently holding sprint button
     #endregion
-
 
     // ==================== INITIALIZATION ====================
     #region Start
@@ -27,7 +28,6 @@ public class PlayerController : MonoBehaviour
         controller = GetComponent<CharacterController>();
     }
     #endregion
-
 
     // ==================== MAIN UPDATE LOOP ====================
     #region Update
@@ -39,8 +39,24 @@ public class PlayerController : MonoBehaviour
         // Only ONE speed is used at a time (never added together)
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
-        Vector3 move = new Vector3(moveInput.x, 0f, moveInput.y);
-        controller.Move(move * currentSpeed * Time.deltaTime);
+
+        Vector3 forward = cameraTransform.forward;
+        Vector3 right = cameraTransform.right;
+
+        forward.y = 0;
+        right.y = 0;
+
+        forward.Normalize();
+        right.Normalize();
+
+        Vector3 moveDirection = forward * moveInput.y + right * moveInput.x;
+        controller.Move(moveDirection * currentSpeed * Time.deltaTime);
+
+        if (shouldFaceMoveDirection && moveDirection.sqrMagnitude > 0.001f)
+        {
+            Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
+            transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, 10f * Time.deltaTime);
+        }
 
         // -------- APPLY GRAVITY --------
         // Gradually increase downward velocity over time (simulates falling)
