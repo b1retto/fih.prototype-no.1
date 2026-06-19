@@ -17,12 +17,14 @@ public class PlayerController : MonoBehaviour
     // ==================== REFERENCES ====================
     [Header("References")]
     [SerializeField] private Transform cameraTransform; // Camera reference for directional movement
+    [SerializeField] private Transform yawTarget;
 
     // ==================== PRIVATE VARIABLES ====================
     private CharacterController controller;   // Handles movement and collision
     private Vector2 moveInput;               // WASD input storage
     private Vector3 velocity;               // Current velocity (used for gravity/jump)
     private bool isSprinting;              // Sprint state tracker
+    public bool isAiming;
 
     // ==================== INITIALIZATION ====================
     void Start()
@@ -36,26 +38,62 @@ public class PlayerController : MonoBehaviour
         // Get current speed based on sprint state
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
-        // Get camera directions for movement
-        Vector3 forward = cameraTransform.forward;
-        Vector3 right = cameraTransform.right;
 
-        // Flatten directions (ignore camera vertical tilt)
-        forward.y = 0f;
-        right.y = 0f;
+        Vector3 moveDirection = Vector3.zero;
 
-        // Normalize for consistent speed in all directions
-        forward.Normalize();
-        right.Normalize();
+        if (isAiming)
+        {
 
-        // Calculate movement direction based on input and camera
-        Vector3 moveDirection = forward * moveInput.y + right * moveInput.x;
+            // Get camera directions for movement
+            Vector3 forward = transform.forward;
+            Vector3 right = transform.right;
+
+            // Flatten directions (ignore camera vertical tilt)
+            forward.y = 0f;
+            right.y = 0f;
+
+            // Normalize for consistent speed in all directions
+            forward.Normalize();
+            right.Normalize();
+
+            // Calculate movement direction based on input and camera
+            moveDirection = forward * moveInput.y + right * moveInput.x;
+
+        }
+        else
+        {
+
+            // Get camera directions for movement
+            Vector3 forward = cameraTransform.forward;
+            Vector3 right = cameraTransform.right;
+
+            // Flatten directions (ignore camera vertical tilt)
+            forward.y = 0f;
+            right.y = 0f;
+
+            // Normalize for consistent speed in all directions
+            forward.Normalize();
+            right.Normalize();
+
+            // Calculate movement direction based on input and camera
+            moveDirection = forward * moveInput.y + right * moveInput.x;
+        }
 
         // Apply horizontal movement
         controller.Move(moveDirection * currentSpeed * Time.deltaTime);
 
-        // Rotate player to face movement direction (if moving)
-        if (moveInput != Vector2.zero)
+        if (isAiming)
+        {
+            Vector3 lookDirection = yawTarget.forward;
+            lookDirection.y = 0;
+
+            if (lookDirection.sqrMagnitude > 0.001f)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
+            }
+        }
+        else if (moveInput != Vector2.zero)
         {
             Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
