@@ -1499,10 +1499,10 @@ MonoBehaviour:
   crosshairUI: {fileID: 2074026625}
   aimCamera: {fileID: 330585545}
   maxDistance: 20
-  crossHairOffsetMultiplier: 0.01
   raycastMask:
     serializedVersion: 2
     m_Bits: 55
+  crossHairOffsetMultiplier: 0.01
 --- !u!1001 &6352760212400695582
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1514,10 +1514,6 @@ PrefabInstance:
     - target: {fileID: 6298237347087960416, guid: b5b546dfa72668f47998e79306deeec1, type: 3}
       propertyPath: m_Name
       value: fih
-      objectReference: {fileID: 0}
-    - target: {fileID: 6298237347087960416, guid: b5b546dfa72668f47998e79306deeec1, type: 3}
-      propertyPath: m_Layer
-      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 8805231266293395924, guid: b5b546dfa72668f47998e79306deeec1, type: 3}
       propertyPath: m_LocalPosition.x
