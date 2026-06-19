@@ -71,6 +71,8 @@ public class AimCameraController : MonoBehaviour
         yaw += look.x * sensitivity;
         pitch -= look.y * sensitivity;
 
+        pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
+
         yawTarget.rotation = Quaternion.Euler(0f, yaw, 0f);
         pitchTarget.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
@@ -89,5 +91,7 @@ public class AimCameraController : MonoBehaviour
 
         yawTarget.rotation = Quaternion.Euler(0f, yaw, 0f);
         pitchTarget.localRotation = Quaternion.Euler(0f, 0f, 0f);
+
+        pitch = 0f;
     }
 }
