@@ -32,6 +32,24 @@
                     "processors": "",
                     "interactions": "Hold",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Aim",
+                    "type": "Button",
+                    "id": "c0a69915-4ade-4962-bda6-0f8c793978d3",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "Hold",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "SwitchShoulder",
+                    "type": "Button",
+                    "id": "4d8e385e-7dee-41c9-9f64-5fa371cfd38f",
+                    "expectedControlType": "",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -111,6 +129,28 @@
                     "action": "Sprint",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "55b3f2eb-4fdc-4084-a38f-9df51804672d",
+                    "path": "<Mouse>/rightButton",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Aim",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "8c87e56d-7ffc-4c34-957b-8b6b4ace32b6",
+                    "path": "<Keyboard>/v",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "SwitchShoulder",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -119,10 +159,19 @@
             "id": "d3074877-b4ea-450f-b51d-eab046c1fa36",
             "actions": [
                 {
-                    "name": "MouseZoom",
+                    "name": "Look",
                     "type": "Value",
-                    "id": "58624270-4917-4121-84b5-9d989c61f8fa",
+                    "id": "1d683f92-a1dd-418f-a172-030e423d103a",
                     "expectedControlType": "Vector2",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": true
+                },
+                {
+                    "name": "Zoom",
+                    "type": "Value",
+                    "id": "918860fc-30c2-4890-9f33-780e0eef20f5",
+                    "expectedControlType": "Axis",
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": true
@@ -131,14 +180,47 @@
             "bindings": [
                 {
                     "name": "",
-                    "id": "7faf8538-fdda-4de9-9694-f7034862d3c0",
-                    "path": "<Mouse>/scroll",
+                    "id": "fdd50291-237b-4398-a5e0-da17af8edb1f",
+                    "path": "<Mouse>/delta",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "MouseZoom",
+                    "action": "Look",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "Mouse",
+                    "id": "6e524fa1-614b-44dd-bb29-e12e8f390874",
+                    "path": "1DAxis",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": true,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "negative",
+                    "id": "faa3440e-f97c-41d9-a77c-f4f2e3cfb42e",
+                    "path": "<Mouse>/scroll/down",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": true
+                },
+                {
+                    "name": "positive",
+                    "id": "eba86526-10f4-4b59-85a4-f2492161a1eb",
+                    "path": "<Mouse>/scroll/up",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Zoom",
+                    "isComposite": false,
+                    "isPartOfComposite": true
                 }
             ]
         }
