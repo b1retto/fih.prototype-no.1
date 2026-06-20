@@ -9,6 +9,7 @@ public class WorldCrossHairController : MonoBehaviour
     [SerializeField] private Camera aimCamera; // The main camera rendering your game view.
     [SerializeField] private float maxDistance = 20f; // Maximum distance the crosshair can look out into the world.
     [SerializeField] private LayerMask raycastMask = -0; // Filters which layers/objects the crosshair raycast will hit.
+    public RaycastHit publicHit;
 
     [Header("Visual Tuning")]
     [SerializeField] private float crossHairOffsetMultiplier = 0.01f; // Tiny distance to push the UI off surfaces so it doesn't clip through walls.
@@ -22,7 +23,7 @@ public class WorldCrossHairController : MonoBehaviour
         // Locks the hidden cursor to the exact center of the game screen so it cannot drift off-screen.
         Cursor.lockState = CursorLockMode.Locked;
 
-        // FIXED: Start with the crosshair hidden by default
+        // Start with the crosshair hidden by default
         SetCrosshairVisibility(false);
 
     }
@@ -45,6 +46,7 @@ public class WorldCrossHairController : MonoBehaviour
         // 3. SHOOT THE RAY: Fire the laser into the scene using our configured distance and layer mask limits.
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, raycastMask))
         {
+            publicHit = hit;
             // CASE A: The laser struck an object (a wall, floor, enemy, etc.).
 
             // Calculate a point slightly hovering off the hit surface using the surface normal (outward facing vector).

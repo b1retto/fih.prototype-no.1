@@ -1,16 +1,46 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class BulletScript : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    private WorldCrossHairController crossHairScript;
+    [SerializeField] private float speed = 10f;
+    [SerializeField] private float bulletRotationSpeed = 60f;
+
+    private Vector3 lockedTargetLocation;
+
     void Start()
     {
-        
+        crossHairScript = GameObject.Find("crosshair").GetComponent<WorldCrossHairController>();
+
+        if (crossHairScript != null)
+        {
+            lockedTargetLocation = crossHairScript.transform.position;
+        }
     }
 
-    // Update is called once per frame
     void Update()
     {
-        
+        if (gameObject != null)
+        {
+            transform.position = Vector3.MoveTowards(transform.position, lockedTargetLocation, speed * Time.deltaTime);
+            transform.Rotate(0f, bulletRotationSpeed * Time.deltaTime, 0f);
+        }
+
+        if (Vector3.Distance(transform.position, lockedTargetLocation) < 0.001f)
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            return;
+        }
+
+        Destroy(gameObject);
     }
 }
