@@ -1,80 +1,83 @@
 using UnityEngine;
+
 public class WorldCrossHairController : MonoBehaviour
 {
-
     [Header("UI Reference")]
-    [SerializeField] private RectTransform crosshairUI; // The UI element. **REQUIRED: Canvas MUST be set to World Space mode!**
+    // The actual crosshair image component (Requires a Canvas set to World Space)
+    [SerializeField] private RectTransform crosshairUI;
 
     [Header("Camera & Raycasting")]
-    [SerializeField] private Camera aimCamera; // The main camera rendering your game view.
-    [SerializeField] private float maxDistance = 20f; // Maximum distance the crosshair can look out into the world.
-    [SerializeField] private LayerMask raycastMask = -0; // Filters which layers/objects the crosshair raycast will hit.
+    [SerializeField] private Camera aimCamera; // The game camera looking at the world
+    [SerializeField] private float maxDistance = 20f; // How far away the crosshair can look/reach
+    [SerializeField] private LayerMask raycastMask = -0; // Filter to choose what objects the crosshair can hit
+
+    // Stores the hit data publicly so other scripts can see what you are aiming at
     public RaycastHit publicHit;
 
     [Header("Visual Tuning")]
-    [SerializeField] private float crossHairOffsetMultiplier = 0.01f; // Tiny distance to push the UI off surfaces so it doesn't clip through walls.
+    // Small buffer distance to stop the crosshair from glitching or sinking inside walls
+    [SerializeField] private float crossHairOffsetMultiplier = 0.01f;
 
-    // Runs once when the scene begins playing.
+    // Runs once when the game starts
     void Start()
     {
-        // Hides the standard Windows/OS mouse pointer from the player's screen.
+        // Hides the standard computer mouse cursor
         Cursor.visible = false;
 
-        // Locks the hidden cursor to the exact center of the game screen so it cannot drift off-screen.
+        // Locks the mouse to the center of the screen so it doesn't click outside the game window
         Cursor.lockState = CursorLockMode.Locked;
 
-        // Start with the crosshair hidden by default
+        // Turns the crosshair off when the game starts
         SetCrosshairVisibility(false);
-
     }
 
-    // Runs automatically every frame to recalculate the 3D crosshair position.
+    // Runs every single frame
     void Update()
     {
-        //If the crosshair is turned off, skip all the heavy raycast math entirely
+        // Optimization: If the crosshair is hidden, stop running the heavy math below
         if (!crosshairUI.gameObject.activeSelf) return;
 
-        // 1. Find the literal absolute center coordinate of your game screen in pixels.
+        // Find the exact center pixel of your screen
         Vector3 screenCenter = new Vector3(Screen.width / 2f, Screen.height / 2f, 0);
 
-        // 2. Creates a mathematical laser "Ray" passing from the camera lens out through that center screen pixel.
+        // Shoots an invisible mathematical line (Ray) straight out from the center of the camera view
         Ray ray = aimCamera.ScreenPointToRay(screenCenter);
 
-        // This variable will hold our final target 3D world coordinate for the crosshair.
+        // This will store where the crosshair should physically sit in 3D space
         Vector3 targetPos;
 
-        // 3. SHOOT THE RAY: Fire the laser into the scene using our configured distance and layer mask limits.
+        // Physics.Raycast shoots the line out. Returns TRUE if it hits something.
         if (Physics.Raycast(ray, out RaycastHit hit, maxDistance, raycastMask))
         {
+            // Saves the hit data so other scripts can access it
             publicHit = hit;
-            // CASE A: The laser struck an object (a wall, floor, enemy, etc.).
 
-            // Calculate a point slightly hovering off the hit surface using the surface normal (outward facing vector).
+            // Math: Hit point is the exact spot on the wall. Normal is the direction pushing out of the wall surface.
+            // This line calculates a position slightly hovering off the surface so it stays visible.
             targetPos = hit.point + hit.normal * crossHairOffsetMultiplier;
 
-            // Forces the UI crosshair flat against the surface angle so it conforms perfectly to the geometry.
+            // Rotates the crosshair image flat against whatever angle it hit (slopes, walls, etc.)
             crosshairUI.rotation = Quaternion.LookRotation(hit.normal);
         }
         else
         {
-            // CASE B: The laser hit nothing (looking directly up at the open sky or a far horizon void).
-
-            // Extends the ray straight forward out into empty space to its maximum allowed configuration distance.
+            // If the ray hits nothing (looking at the sky), place it at the maximum distance in mid-air
             targetPos = ray.GetPoint(maxDistance);
 
-            // Forces the crosshair to stay perfectly flat relative to the camera lens' forward viewpoint.
+            // Rotates the crosshair to stay perfectly flat against your computer screen
             crosshairUI.forward = aimCamera.transform.forward;
         }
 
-        // 4. Update the actual 3D transformation location of the world canvas crosshair UI element.
+        // Moves the crosshair image to the newly calculated 3D world position
         crosshairUI.position = targetPos;
     }
 
-    //Added public method so the CameraSwitcher script can turn the crosshair on and off
+    // A public function that other scripts can call to turn the crosshair on or off
     public void SetCrosshairVisibility(bool visible)
     {
         if (crosshairUI != null)
         {
+            // Activates or deactivates the UI object based on the True/False value passed in
             crosshairUI.gameObject.SetActive(visible);
         }
     }

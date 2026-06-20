@@ -127,8 +127,10 @@ public class AimCameraController : MonoBehaviour
         flatForward.y = 0;
 
         // Check calculation to see if the vector is functionally dead (0 length); skips rotation tracking if it is empty.
-        if (flatForward.sqrMagnitude < 0.001f)
+        if (flatForward == Vector3.zero)
+        {
             return;
+        }
 
         // Calculates a clean look angle looking down your flattened vector path and sets the yaw value to match.
         yaw = Quaternion.LookRotation(flatForward).eulerAngles.y;

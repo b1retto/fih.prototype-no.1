@@ -27,7 +27,7 @@ public class BulletScript : MonoBehaviour
             transform.Rotate(0f, bulletRotationSpeed * Time.deltaTime, 0f);
         }
 
-        if (Vector3.Distance(transform.position, lockedTargetLocation) < 0.001f)
+        if (transform.position == lockedTargetLocation)
         {
             Destroy(gameObject);
             return;
