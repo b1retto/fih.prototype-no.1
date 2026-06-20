@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 42511529}
   - component: {fileID: 42511528}
   - component: {fileID: 42511527}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -318,8 +318,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 330585543}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.1521234, y: 0.0000000032636638, z: -5.0232596e-10, w: 0.98836154}
-  m_LocalPosition: {x: 0, y: 1.9021177, z: -2.8611517}
+  m_LocalRotation: {x: -0.037528012, y: -0.000000017956516, z: -6.7434747e-10, w: 0.9992956}
+  m_LocalPosition: {x: 0, y: 1.9021175, z: -2.8611507}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -854,11 +854,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 53c8dd5bd072ad34897a18dbc63c0e8f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  walkSpeed: 5
-  sprintSpeed: 10
+  walkSpeed: 3
+  sprintSpeed: 7
   rotationSpeed: 10
-  bulletSpeed: 10
-  bulletCoolDown: 0.2
+  bulletCoolDown: 0.1
   jumpHeight: 2
   gravity: -9.8
   cameraTransform: {fileID: 825066492}
@@ -884,7 +883,7 @@ CharacterController:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Height: 2
+  m_Height: 1.75
   m_Radius: 0.25
   m_SlopeLimit: 45
   m_StepOffset: 0.3
@@ -915,7 +914,7 @@ GameObject:
   - component: {fileID: 786405717}
   - component: {fileID: 786405716}
   - component: {fileID: 786405715}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1027,6 +1026,7 @@ GameObject:
   - component: {fileID: 825066491}
   - component: {fileID: 825066490}
   - component: {fileID: 825066489}
+  - component: {fileID: 825066493}
   - component: {fileID: 825066488}
   m_Layer: 0
   m_Name: ThirdPersonCamera
@@ -1106,7 +1106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineRotationComposer
   Composition:
-    ScreenPosition: {x: 0, y: 0}
+    ScreenPosition: {x: 0, y: 0.2}
     DeadZone:
       Enabled: 0
       Size: {x: 0.2, y: 0.2}
@@ -1142,7 +1142,7 @@ MonoBehaviour:
     RotationDamping: {x: 1, y: 1, z: 1}
     QuaternionDamping: 1
   OrbitStyle: 0
-  Radius: 3.000001
+  Radius: 3
   Orbits:
     Top:
       Radius: 2
@@ -1236,13 +1236,52 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 825066487}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.1521234, y: 0.0000000030596512, z: 8.231657e-10, w: 0.98836154}
-  m_LocalPosition: {x: 0, y: 1.9021177, z: -2.8611517}
+  m_LocalRotation: {x: -0.037528012, y: -0.00000001795652, z: -6.743474e-10, w: 0.9992956}
+  m_LocalPosition: {x: 0, y: 1.9021175, z: -2.8611507}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 628078065}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &825066493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825066487}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dbe43d662878a7c43bcd44d43c9e2094, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineDeoccluder
+  CollideAgainst:
+    serializedVersion: 2
+    m_Bits: 128
+  IgnoreTag: 
+  TransparentLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  MinimumDistanceFromTarget: 0.3
+  AvoidObstacles:
+    Enabled: 1
+    DistanceLimit: 0
+    MinimumOcclusionTime: 0
+    CameraRadius: 0.1
+    UseFollowTarget:
+      Enabled: 0
+      YOffset: 0
+    Strategy: 0
+    MaximumEffort: 1
+    SmoothingTime: 0
+    Damping: 0
+    DampingWhenOccluded: 0
+  ShotQualityEvaluation:
+    Enabled: 0
+    OptimalDistance: 10
+    NearLimit: 5
+    FarLimit: 30
+    MaxQualityBoost: 0.2
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -1568,7 +1607,7 @@ GameObject:
   - component: {fileID: 1604682392}
   - component: {fileID: 1604682391}
   - component: {fileID: 1604682390}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Cube (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1937,7 +1976,7 @@ MonoBehaviour:
   maxDistance: 20
   raycastMask:
     serializedVersion: 2
-    m_Bits: 55
+    m_Bits: 183
   crossHairOffsetMultiplier: 0.01
 --- !u!1001 &6352760212400695582
 PrefabInstance:

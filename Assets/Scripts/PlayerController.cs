@@ -6,7 +6,6 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float walkSpeed = 5f; // Flat base speed for normal exploration walking.
     [SerializeField] private float sprintSpeed = 10f; // Max velocity used when holding down the sprint modifier button.
     [SerializeField] private float rotationSpeed = 10f; // Slerp modifier determining how quickly the character turns toward their path.
-    [SerializeField] private float bulletSpeed = 10f;
     [SerializeField] private float bulletCoolDown = 0.5f;
     private bool canShoot = true;
 
