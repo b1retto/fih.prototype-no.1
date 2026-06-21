@@ -6839,6 +6839,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::UIManager
   pauseUI: {fileID: 5769770}
+  cameraAxisController: {fileID: 825066488}
+  aimCameraController: {fileID: 1562939088}
 --- !u!1 &978285547
 GameObject:
   m_ObjectHideFlags: 0
