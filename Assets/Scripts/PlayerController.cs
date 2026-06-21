@@ -171,6 +171,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnSprint(InputAction.CallbackContext context)
     {
+
         if (context.started) isSprinting = true;
         else if
         (context.canceled) isSprinting = false;
@@ -178,6 +179,7 @@ public class PlayerController : MonoBehaviour
 
     public void OnJump(InputAction.CallbackContext context)
     {
+
         if (context.performed && controller.isGrounded)
         {
             jumpParticle.Play();
@@ -189,6 +191,9 @@ public class PlayerController : MonoBehaviour
 
     public void OnShoot(InputAction.CallbackContext context)
     {
+        if (Time.timeScale == 0f)
+            return;
+
         if (context.performed && isAiming && canShoot)
         {
             // Lock the gate immediately so spam-clicking can't fire multiple bullets
