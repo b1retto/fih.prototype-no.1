@@ -10,7 +10,6 @@ public class WorldCrossHairController : MonoBehaviour
     [SerializeField] private Camera aimCamera; // The game camera looking at the world
     [SerializeField] private float maxDistance = 20f; // How far away the crosshair can look/reach
     [SerializeField] private LayerMask raycastMask = -0; // Filter to choose what objects the crosshair can hit
-
     // Stores the hit data publicly so other scripts can see what you are aiming at
     public RaycastHit publicHit;
 

@@ -24,6 +24,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private GameObject bulletpoint; // Bullets creation point
     [SerializeField] private ParticleSystem jumpParticle;
     [SerializeField] private ParticleSystem runParticle;
+    [SerializeField] private ParticleSystem shootParticle;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -128,6 +129,9 @@ public class PlayerController : MonoBehaviour
                 // Slerp smoothly transitions between two rotations - the 10f controls speed
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
             }
+
+            // Just make the particle face the exact same direction the camera is looking!
+            shootParticle.transform.forward = Camera.main.transform.forward;
         }
         else if (moveInput != Vector2.zero)
         {
@@ -177,6 +181,8 @@ public class PlayerController : MonoBehaviour
 
             // Create a copy of the bullet prefab at the barrel position with the player's rotation
             GameObject bulletShot = Instantiate(bullet, bulletpoint.transform.position, transform.rotation);
+
+            shootParticle.Play();
 
             // Schedule ResetShoot to run after the cooldown delay (in seconds)
             Invoke("ResetShoot", bulletCoolDown);
