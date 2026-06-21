@@ -25,6 +25,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private ParticleSystem jumpParticle;
     [SerializeField] private ParticleSystem runParticle;
     [SerializeField] private ParticleSystem shootParticle;
+    [SerializeField] private AudioClip pewpewSound;
+    [SerializeField] private AudioClip jumpSound;
+    [SerializeField] private AudioClip runningSound;
+
+    public AudioSource audioSource;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -43,9 +48,12 @@ public class PlayerController : MonoBehaviour
     {
         if (controller.isGrounded && isSprinting == true && moveInput != Vector2.zero)
         {
-            if (!runParticle.isPlaying)
+            if (!runParticle.isPlaying || !audioSource.isPlaying || audioSource.clip != runningSound)
             {
                 runParticle.Play();
+                audioSource.clip = runningSound;
+                audioSource.loop = true;
+                audioSource.Play();
             }
         }
         else if (!controller.isGrounded || isSprinting == false || moveInput == Vector2.zero)
@@ -53,6 +61,12 @@ public class PlayerController : MonoBehaviour
             if (runParticle.isPlaying)
             {
                 runParticle.Stop();
+            }
+
+            if (audioSource.clip == runningSound)
+            {
+                audioSource.clip = null;
+                audioSource.loop = false;
             }
         }
 
@@ -167,6 +181,7 @@ public class PlayerController : MonoBehaviour
         if (context.performed && controller.isGrounded)
         {
             jumpParticle.Play();
+            audioSource.PlayOneShot(jumpSound);
             // Calculates exactly how much upward force is needed to reach our target jumpHeight before gravity pulls down
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
@@ -183,6 +198,7 @@ public class PlayerController : MonoBehaviour
             GameObject bulletShot = Instantiate(bullet, bulletpoint.transform.position, transform.rotation);
 
             shootParticle.Play();
+            audioSource.PlayOneShot(pewpewSound);
 
             // Schedule ResetShoot to run after the cooldown delay (in seconds)
             Invoke("ResetShoot", bulletCoolDown);
