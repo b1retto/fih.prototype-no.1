@@ -16,7 +16,7 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.BackQuote))
         {
             if (!pauseUI.activeSelf)
             {
@@ -46,17 +46,22 @@ public class UIManager : MonoBehaviour
     {
         pauseUI.SetActive(false);
 
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.None;
         Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
 
         Time.timeScale = 1f;
 
-        if (cameraAxisController == null) cameraAxisController.enabled = true;
+        if (cameraAxisController != null) cameraAxisController.enabled = true;
         aimCameraController.enabled = true;
     }
 
     public void OnExitPress()
     {
+        Time.timeScale = 1f;
 
+        Application.Quit();
+
+        UnityEditor.EditorApplication.isPlaying = false;
     }
 }
