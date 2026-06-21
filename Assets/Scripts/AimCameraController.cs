@@ -8,140 +8,140 @@ using UnityEngine.InputSystem;
 public class AimCameraController : MonoBehaviour
 {
     [Header("Camera Targets")]
-    [SerializeField] private Transform yawTarget; // The target object responsible for turning left and right.
-    [SerializeField] private Transform pitchTarget; // The target object responsible for looking up and down.
+    [SerializeField] private Transform yawTarget; // Object used to look left/right
+    [SerializeField] private Transform pitchTarget; // Object used to look up/down
 
     [Header("Input Action References")]
-    [SerializeField] private InputActionReference lookInput; // Pointer to the New Input System vector data for mouse/joystick look.
-    [SerializeField] private InputActionReference switchShoulderInput; // Pointer to the button action used to swap shoulders.
+    [SerializeField] private InputActionReference lookInput; // Reads mouse or joystick movement data
+    [SerializeField] private InputActionReference switchShoulderInput; // Reads the button press to swap shoulders
 
     [Header("Sensitivity Settings")]
-    [SerializeField] private float mouseSensitivity = 0.05f; // Multiplier to downscale raw mouse delta inputs.
-    [SerializeField] private float sensitivity = 1.5f; // General sensitivity scaling factor for all look movement.
+    [SerializeField] private float mouseSensitivity = 0.05f; // Slows down raw mouse speed so it isn't twitchy
+    [SerializeField] private float sensitivity = 1.5f; // General speed multiplier for looking around
 
     [Header("Rotation Constraints")]
-    [SerializeField] private float pitchMin = -40f; // Maximum angle allowed when looking down.
-    [SerializeField] private float pitchMax = 80f; // Maximum angle allowed when looking up (prevents flipping).
+    [SerializeField] private float pitchMin = -40f; // Limit for looking down (stops camera from hitting floor)
+    [SerializeField] private float pitchMax = 80f; // Limit for looking up (stops camera from flipping upside down)
 
     [Header("Cinemachine Settings")]
-    [SerializeField] private CinemachineThirdPersonFollow aimCam; // Reference to the Cinemachine extension handling positioning.
-    [SerializeField] private float shoulderSwitchSpeed = 5f; // The interpolation speed (Lerp) used to slide between shoulders.
+    [SerializeField] private CinemachineThirdPersonFollow aimCam; // Cinemachine component that positions the camera
+    [SerializeField] private float shoulderSwitchSpeed = 5f; // How fast the camera slides from left to right side
 
-    private float yaw; // Stores the accumulated horizontal look rotation.
-    private float pitch; // Stores the accumulated vertical look rotation.
-    private float targetCameraSide; // Stores the target shoulder value (0 for left side, 1 for right side).
+    private float yaw; // Stores current horizontal angle (left/right)
+    private float pitch; // Stores current vertical angle (up/down)
+    private float targetCameraSide; // Target shoulder position: 0 is fully left, 1 is fully right
 
-    // Runs immediately when the script instance is initialized, before Start().
+    // Runs once when the game object spawns
     void Awake()
     {
-        // Finds and caches the CinemachineThirdPersonFollow component attached to this GameObject.
+        // Grabs the Cinemachine component automatically from this object
         aimCam = GetComponent<CinemachineThirdPersonFollow>();
 
-        // Sets our target shoulder to match whatever value the camera currently has configured in the Inspector.
+        // Sets initial shoulder target to match what you set in the Inspector
         targetCameraSide = aimCam.CameraSide;
     }
 
-    // Runs on the first frame before any Update loop executes.
+    // Runs on the first frame of the game
     void Start()
     {
-        // Extracts the current rotation angles from your horizontal tracking target.
+        // Gets the current starting rotation of the horizontal object
         Vector3 angles = yawTarget.rotation.eulerAngles;
 
-        // Synchronizes internal code track variables with the initial rotations present in your Unity scene.
+        // Saves those starting angles into our tracker variables
         yaw = angles.y;
         pitch = angles.x;
 
-        // Normalizes Unity's 0-360 angle layout into a -180 to 180 coordinate setup to cleanly match pitch limits.
+        // Converts Unity angles (0 to 360) into standard angles (-180 to 180) to fix math glitches
         if (pitch > 180) pitch -= 360;
 
-        // Activates the Look input map asset so it actively starts reading user input changes.
+        // Tells the look input system to start listening for mouse/joystick movement
         lookInput.asset.Enable();
     }
 
-    // Runs whenever this GameObject is activated/enabled in the hierarchy.
+    // Runs whenever this script becomes active
     void OnEnable()
     {
-        // Activates the shoulder-swapping control scheme.
+        // Activates the shoulder switch button input
         switchShoulderInput.action.Enable();
 
-        // Hooks up (subscribes) our "OnSwitchShoulder" function to fire whenever the shoulder button is hit.
+        // Subscribes to an event: "When this button is pressed, run the OnSwitchShoulder function"
         switchShoulderInput.action.performed += OnSwitchShoulder;
     }
 
-    // Runs whenever this GameObject is deactivated/disabled in the hierarchy.
+    // Runs whenever this script is disabled or turned off
     void OnDisable()
     {
-        // Turns off the shoulder-swapping control scheme to preserve resources.
+        // Deactivates the shoulder switch button input
         switchShoulderInput.action.Disable();
 
-        // Unhooks (unsubscribes) our function from the event to prevent memory leaks in your project.
+        // Unsubscribes from the event to keep code clean and prevent memory leaks
         switchShoulderInput.action.performed -= OnSwitchShoulder;
     }
 
-    // Runs automatically every single frame. Deals with mouse tracking and object movements.
+    // Runs every single frame of the game
     void Update()
     {
-        // Reads the look vector (X: horizontal change, Y: vertical change) coming from your input device.
+        // Reads input data (X = horizontal movement, Y = vertical movement)
         Vector2 look = lookInput.action.ReadValue<Vector2>();
 
-        // Determines if a mouse is connected and if it has physically moved across your desk.
+        // Checks if a mouse is connected and actively moving
         if (Mouse.current != null && Mouse.current.delta.IsActuated())
         {
-            // Reduces raw mouse hardware speed so the look behavior doesn't wildly snap out of control.
+            // Multiplies mouse input by sensitivity so looking isn't too fast
             look *= mouseSensitivity;
         }
 
-        // Adds horizontal movement input directly to your persistent yaw tracker variable.
+        // Adds horizontal movement to the total left/right rotation value
         yaw += look.x * sensitivity;
 
-        // Subtracts vertical movement input from your pitch tracker variable (subtraction prevents inverted controls).
+        // Subtracts vertical movement to look up/down (subtracting stops controls from being inverted)
         pitch -= look.y * sensitivity;
 
-        // CRITICAL FIX: Forces the vertical track angle to stay within your safe boundaries, stopping screen flips.
+        // Locks the pitch value between our Min and Max limits so the player can't look too high or low
         pitch = Mathf.Clamp(pitch, pitchMin, pitchMax);
 
-        // Creates a clean, upright 3D rotation using the updated yaw value and applies it to the horizontal target object.
+        // Converts our flat yaw angle into a 3D rotation and applies it to turn left/right
         yawTarget.rotation = Quaternion.Euler(0f, yaw, 0f);
 
-        // Creates a local 3D tilt using the clamped pitch value and applies it directly to the vertical target object.
+        // Converts our flat pitch angle into a 3D rotation and applies it to tilt up/down
         pitchTarget.localRotation = Quaternion.Euler(pitch, 0f, 0f);
 
-        // Smoothly interpolates the current Cinemachine CameraSide value closer to your target shoulder position over time.
+        // Smoothly slides the camera position value closer to the target shoulder value frame by frame
         aimCam.CameraSide = Mathf.Lerp(aimCam.CameraSide, targetCameraSide, Time.deltaTime * shoulderSwitchSpeed);
     }
 
-    // Triggered automatically via Event whenever the player taps your registered Shoulder Switch action button.
+    // Automatically runs when the shoulder switch button is pressed
     private void OnSwitchShoulder(InputAction.CallbackContext context)
     {
-        // Evaluation check: If camera is currently on the left side (<0.5), snap goal to 1 (Right). Otherwise, snap to 0 (Left).
+        // Inline IF statement: If currently on the left side (< 0.5), switch to 1 (Right). Otherwise, switch to 0 (Left).
         targetCameraSide = aimCam.CameraSide < 0.5f ? 1f : 0f;
     }
 
-    // Public utility method allowing external scripts to automatically align your aim logic to face a specific camera's forward path.
+    // Public method that external scripts can call to instantly align this script with a camera's view
     public void SetYawPitchFromCameraForward(Transform cameraTransform)
     {
-        // Obtains the forward facing directional vector of your chosen reference camera.
+        // Gets the direction the reference camera is facing
         Vector3 flatForward = cameraTransform.forward;
 
-        // Flattens the vector out by removing vertical elevation, leaving an absolute flat horizon path.
+        // Clears the vertical value (Y = 0) so we only calculate flat ground direction
         flatForward.y = 0;
 
-        // Check calculation to see if the vector is functionally dead (0 length); skips rotation tracking if it is empty.
+        // Safety check: If the vector has no length (player isn't moving/looking anywhere), stop here
         if (flatForward == Vector3.zero)
         {
             return;
         }
 
-        // Calculates a clean look angle looking down your flattened vector path and sets the yaw value to match.
+        // Converts the 3D direction vector into a 0-360 angle and extracts the horizontal (Y) component
         yaw = Quaternion.LookRotation(flatForward).eulerAngles.y;
 
-        // Directly forces the horizontal target object to snap to this newly calculated camera rotation angle.
+        // Instantly turns our horizontal object to match that camera angle
         yawTarget.rotation = Quaternion.Euler(0f, yaw, 0f);
 
-        // Directly flattens the vertical target object's tilt layout back out to zero level.
+        // Resets the vertical object to look completely straight ahead
         pitchTarget.localRotation = Quaternion.Euler(0f, 0f, 0f);
 
-        // Resets the internal pitch tracking number to 0 to keep variables perfectly in sync with the line above.
+        // Resets our internal vertical tracking variable back to zero to match the line above
         pitch = 0f;
     }
 }

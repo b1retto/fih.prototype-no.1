@@ -22,6 +22,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform yawTarget;
     [SerializeField] private GameObject bullet;
     [SerializeField] private GameObject bulletpoint; // Bullets creation point
+    [SerializeField] private ParticleSystem jumpParticle;
+    [SerializeField] private ParticleSystem runParticle;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -38,6 +40,21 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (controller.isGrounded && isSprinting == true && moveInput != Vector2.zero)
+        {
+            if (!runParticle.isPlaying)
+            {
+                runParticle.Play();
+            }
+        }
+        else if (!controller.isGrounded || isSprinting == false || moveInput == Vector2.zero)
+        {
+            if (runParticle.isPlaying)
+            {
+                runParticle.Stop();
+            }
+        }
+
         // If the player is on the ground and being pushed down
         if (controller.isGrounded && velocity.y < 0)
         {
@@ -86,6 +103,11 @@ public class PlayerController : MonoBehaviour
             moveDirection = forward * moveInput.y + right * moveInput.x;
         }
 
+        if (moveDirection != Vector3.zero)
+        {
+            runParticle.transform.forward = -moveDirection.normalized;
+        }
+
         // Actually move the player horizontally
         controller.Move(moveDirection * currentSpeed * Time.deltaTime);
 
@@ -132,13 +154,15 @@ public class PlayerController : MonoBehaviour
     public void OnSprint(InputAction.CallbackContext context)
     {
         if (context.started) isSprinting = true;
-        else if (context.canceled) isSprinting = false;
+        else if
+        (context.canceled) isSprinting = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
         if (context.performed && controller.isGrounded)
         {
+            jumpParticle.Play();
             // Calculates exactly how much upward force is needed to reach our target jumpHeight before gravity pulls down
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
