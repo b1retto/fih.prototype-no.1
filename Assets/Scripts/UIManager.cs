@@ -102,6 +102,21 @@ public class UIManager : MonoBehaviour
         aimCameraController.enabled = true;
     }
 
+    public void OnReturnPress()
+    {
+        hasStarted = false;
+
+        startMenuUI.SetActive(true);
+        pauseUI.SetActive(false);
+
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        Time.timeScale = 0f;
+        if (cameraAxisController != null) cameraAxisController.enabled = false;
+        if (aimCameraController != null) aimCameraController.enabled = false;
+    }
+
     public void OnExitPress()
     {
         Time.timeScale = 1f;
