@@ -7,6 +7,7 @@ public class UIManager : MonoBehaviour
 {
     [SerializeField] private GameObject startMenuUI;
     [SerializeField] private GameObject pauseUI;
+    [SerializeField] private GameObject controlsUI;
     [SerializeField] private WorldCrossHairController crosshairController;
     [SerializeField] private CinemachineInputAxisController cameraAxisController;
     [SerializeField] private AimCameraController aimCameraController;
@@ -18,6 +19,7 @@ public class UIManager : MonoBehaviour
     {
         startMenuUI.SetActive(true);
         pauseUI.SetActive(false);
+        controlsUI.SetActive(false);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
@@ -52,6 +54,7 @@ public class UIManager : MonoBehaviour
     {
         hasStarted = true;
         startMenuUI.SetActive(false);
+        controlsUI.SetActive(true);
 
         if (crosshairController != null)
         {
@@ -69,6 +72,7 @@ public class UIManager : MonoBehaviour
     public void onPausePress()
     {
         pauseUI.SetActive(true);
+        controlsUI.SetActive(false);
 
         if (crosshairController != null)
         {
@@ -87,6 +91,7 @@ public class UIManager : MonoBehaviour
     public void OnResumePress()
     {
         pauseUI.SetActive(false);
+        controlsUI.SetActive(true);
 
         if (crosshairController != null)
         {
@@ -108,6 +113,7 @@ public class UIManager : MonoBehaviour
 
         startMenuUI.SetActive(true);
         pauseUI.SetActive(false);
+        controlsUI.SetActive(false);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
