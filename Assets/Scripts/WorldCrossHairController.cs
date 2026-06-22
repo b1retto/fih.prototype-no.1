@@ -2,9 +2,10 @@ using UnityEngine;
 
 public class WorldCrossHairController : MonoBehaviour
 {
-    [Header("UI Reference")]
+    [Header("References")]
     // The actual crosshair image component (Requires a Canvas set to World Space)
     [SerializeField] private RectTransform crosshairUI;
+    [SerializeField] private UIManager uiManager;
 
     [Header("Camera & Raycasting")]
     [SerializeField] private Camera aimCamera; // The game camera looking at the world
@@ -17,23 +18,29 @@ public class WorldCrossHairController : MonoBehaviour
     // Small buffer distance to stop the crosshair from glitching or sinking inside walls
     [SerializeField] private float crossHairOffsetMultiplier = 0.01f;
 
+
+    void Awake()
+    {
+        // Turns the crosshair off when the game starts
+        SetCrosshairVisibility(false);
+    }
+
     // Runs once when the game starts
     void Start()
     {
-        // Hides the standard computer mouse cursor
-        Cursor.visible = false;
-
-        // Locks the mouse to the center of the screen so it doesn't click outside the game window
-        Cursor.lockState = CursorLockMode.Locked;
-
-        // Turns the crosshair off when the game starts
-        SetCrosshairVisibility(false);
+        if (aimCamera == null)
+        {
+            aimCamera = Camera.main;
+        }
     }
 
     // Runs every single frame
     void Update()
     {
-        // Optimization: If the crosshair is hidden, stop running the heavy math below
+        // Safe check to prevent errors if references are completely missing
+        if (crosshairUI == null || aimCamera == null) return;
+
+        // If the crosshair is hidden, stop running the heavy math below
         if (!crosshairUI.gameObject.activeSelf) return;
 
         // Find the exact center pixel of your screen

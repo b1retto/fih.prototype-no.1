@@ -1,23 +1,41 @@
 using Unity.Cinemachine;
+using UnityEditor.Search;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
+    [SerializeField] private GameObject startMenuUI;
     [SerializeField] private GameObject pauseUI;
+    [SerializeField] private WorldCrossHairController crosshairController;
     [SerializeField] private CinemachineInputAxisController cameraAxisController;
     [SerializeField] private AimCameraController aimCameraController;
+
+    public bool hasStarted = false;
 
 
     void Start()
     {
+        startMenuUI.SetActive(true);
+        pauseUI.SetActive(false);
 
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        Time.timeScale = 0f;
+        if (cameraAxisController != null) cameraAxisController.enabled = false;
+        if (aimCameraController != null) aimCameraController.enabled = false;
     }
 
     void Update()
     {
+        if (!hasStarted) return;
+
         if (Input.GetKeyDown(KeyCode.BackQuote))
         {
+            if (!hasStarted)
+                return;
+
             if (!pauseUI.activeSelf)
             {
                 onPausePress();
@@ -29,9 +47,33 @@ public class UIManager : MonoBehaviour
         }
     }
 
+
+    public void OnStartPress()
+    {
+        hasStarted = true;
+        startMenuUI.SetActive(false);
+
+        if (crosshairController != null)
+        {
+            crosshairController.SetCrosshairVisibility(true);
+        }
+
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
+
+        Time.timeScale = 1f;
+        if (cameraAxisController != null) cameraAxisController.enabled = true;
+        if (aimCameraController != null) aimCameraController.enabled = true;
+    }
+
     public void onPausePress()
     {
         pauseUI.SetActive(true);
+
+        if (crosshairController != null)
+        {
+            crosshairController.SetCrosshairVisibility(false);
+        }
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
@@ -46,7 +88,11 @@ public class UIManager : MonoBehaviour
     {
         pauseUI.SetActive(false);
 
-        Cursor.lockState = CursorLockMode.None;
+        if (crosshairController != null)
+        {
+            crosshairController.SetCrosshairVisibility(true);
+        }
+
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
@@ -62,6 +108,8 @@ public class UIManager : MonoBehaviour
 
         Application.Quit();
 
+#if UNITY_EDITOR
         UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 }
