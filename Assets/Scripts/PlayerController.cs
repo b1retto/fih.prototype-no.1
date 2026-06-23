@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float sprintSpeed = 10f;
     [SerializeField] private float rotationSpeed = 10f; // Controls how smoothly the player turns - higher = snappier turns
     [SerializeField] private float bulletCoolDown = 0.5f;
+    public int maxHealth = 100;
+    public int currentHealth;
+    public HealthBarScript healthBar;
     private bool canShoot = true; // Acts like a gate - true means the player is allowed to fire
 
     [Header("Jump Settings")]
@@ -28,6 +31,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private AudioClip pewpewSound;
     [SerializeField] private AudioClip jumpSound;
     [SerializeField] private AudioClip runningSound;
+    [SerializeField] private AudioClip walkingSound;
 
     public AudioSource audioSource;
 
@@ -42,10 +46,17 @@ public class PlayerController : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
+        currentHealth = maxHealth;
+        healthBar.SetMaxHealth(maxHealth);
     }
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            TakeDamage(20);
+        }
+
         if (controller.isGrounded && isSprinting == true && moveInput != Vector2.zero)
         {
             if (!runParticle.isPlaying || !audioSource.isPlaying || audioSource.clip != runningSound)
@@ -64,6 +75,24 @@ public class PlayerController : MonoBehaviour
             }
 
             if (audioSource.clip == runningSound)
+            {
+                audioSource.clip = null;
+                audioSource.loop = false;
+            }
+        }
+
+        if (controller.isGrounded && isSprinting == false && moveInput != Vector2.zero)
+        {
+            if (!audioSource.isPlaying || audioSource.clip != walkingSound)
+            {
+                audioSource.clip = walkingSound;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+        }
+        else if (!controller.isGrounded || isSprinting == true || moveInput == Vector2.zero)
+        {
+            if (audioSource.clip == walkingSound)
             {
                 audioSource.clip = null;
                 audioSource.loop = false;
@@ -208,6 +237,12 @@ public class PlayerController : MonoBehaviour
             // Schedule ResetShoot to run after the cooldown delay (in seconds)
             Invoke("ResetShoot", bulletCoolDown);
         }
+    }
+
+    void TakeDamage(int damage)
+    {
+        currentHealth -= damage;
+        healthBar.SetHealth(currentHealth);
     }
 
     void ResetShoot()
