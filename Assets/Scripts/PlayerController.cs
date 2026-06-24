@@ -188,7 +188,10 @@ public class PlayerController : MonoBehaviour
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
             }
 
-            shootParticle.transform.forward = Camera.main.transform.forward;
+            if (Camera.main != null && shootParticle != null)
+            {
+                shootParticle.transform.forward = Camera.main.transform.forward;
+            }
         }
         else if (moveInput != Vector2.zero)
         {
@@ -224,7 +227,7 @@ public class PlayerController : MonoBehaviour
         if (context.performed && controller.isGrounded)
         {
             jumpParticle.Play();
-            audioSource.PlayOneShot(jumpSound);
+            AudioSource.PlayClipAtPoint(jumpSound, transform.position);
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
@@ -240,7 +243,7 @@ public class PlayerController : MonoBehaviour
             GameObject bulletShot = Instantiate(bullet, bulletpoint.transform.position, transform.rotation);
 
             shootParticle.Play();
-            audioSource.PlayOneShot(pewpewSound);
+            AudioSource.PlayClipAtPoint(pewpewSound, transform.position);
 
             Invoke("ResetShoot", bulletCoolDown);
         }

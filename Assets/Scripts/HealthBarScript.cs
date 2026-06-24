@@ -44,6 +44,9 @@ public class HealthBarScript : MonoBehaviour
     {
         if (gameOverScene.activeSelf == false)
         {
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
+
             Time.timeScale = 0f;
 
             gameOverScene.SetActive(true);
@@ -52,7 +55,7 @@ public class HealthBarScript : MonoBehaviour
             gameObject.SetActive(false);
             uiManager.controlsUI.SetActive(false);
 
-            Invoke("DisablePlayerController()", 0.01f);
+            Invoke("DisablePlayerController", 0.01f);
         }
     }
 

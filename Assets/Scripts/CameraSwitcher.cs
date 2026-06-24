@@ -126,4 +126,12 @@ public class CameraSwitcher : MonoBehaviour
         aimCameraController.SetYawPitchFromCameraForward(freelookCam.transform);
     }
 
+    public void CleanUpInputBeforeReload()
+    {
+        if (input != null)
+        {
+            input.Disable();
+        }
+    }
 }
+
