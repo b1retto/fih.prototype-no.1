@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UI;
 
 public class HealthBarScript : MonoBehaviour
@@ -6,6 +7,18 @@ public class HealthBarScript : MonoBehaviour
     public Slider slider;
     public Gradient gradient;
     public Image fill;
+
+    [SerializeField] private GameObject gameOverScene;
+    [SerializeField] private GameObject mainCamera;
+    [SerializeField] private PlayerController playerController;
+
+    [SerializeField] private UIManager uiManager;
+
+    void Start()
+    {
+        gameOverScene.SetActive(false);
+        mainCamera.SetActive(true);
+    }
 
     public void SetMaxHealth(int health)
     {
@@ -20,5 +33,31 @@ public class HealthBarScript : MonoBehaviour
         slider.value = health;
 
         fill.color = gradient.Evaluate(slider.normalizedValue);
+
+        if (slider.value == 0)
+        {
+            GameOver();
+        }
+    }
+
+    public void GameOver()
+    {
+        if (gameOverScene.activeSelf == false)
+        {
+            Time.timeScale = 0f;
+
+            gameOverScene.SetActive(true);
+            mainCamera.SetActive(false);
+
+            gameObject.SetActive(false);
+            uiManager.controlsUI.SetActive(false);
+
+            Invoke("DisablePlayerController()", 0.01f);
+        }
+    }
+
+    void DisablePlayerController()
+    {
+        playerController.enabled = false;
     }
 }

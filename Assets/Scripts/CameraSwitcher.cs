@@ -10,8 +10,7 @@ public class CameraSwitcher : MonoBehaviour
     [SerializeField] private CinemachineInputAxisController inputAxisController; // Component that feeds user input into the Freelook camera.
 
     [Header("References")]
-    [SerializeField] private Camera mainCamera; // Reference to the actual physical Unity Camera rendering the viewport.
-    [SerializeField] private PlayerController player; // Reference to your player movement script to pass state data.
+    [SerializeField] private PlayerController player; // Reference to your playerC movement script to pass state data.
     [SerializeField] private GameObject crosshairUI; // Reference to the UI crosshair object to toggle on/off (currently unused in this code).
     [SerializeField] private PlayerActions input; // Reference to your auto-generated C# class handling player controls.
     //Changed this from a basic GameObject reference to your specific crosshair script component

@@ -52,6 +52,23 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        // 1. When time is paused, explicitly stop looping movement sounds & run particles
+        if (Time.timeScale == 0f)
+        {
+            if (runParticle != null && runParticle.isPlaying)
+            {
+                runParticle.Stop();
+            }
+
+            if (audioSource != null && audioSource.isPlaying && (audioSource.clip == runningSound || audioSource.clip == walkingSound))
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+                audioSource.loop = false;
+            }
+            return;
+        }
+
         if (Input.GetKeyDown(KeyCode.B))
         {
             TakeDamage(20);
@@ -76,6 +93,7 @@ public class PlayerController : MonoBehaviour
 
             if (audioSource.clip == runningSound)
             {
+                audioSource.Stop();
                 audioSource.clip = null;
                 audioSource.loop = false;
             }
@@ -94,6 +112,7 @@ public class PlayerController : MonoBehaviour
         {
             if (audioSource.clip == walkingSound)
             {
+                audioSource.Stop();
                 audioSource.clip = null;
                 audioSource.loop = false;
             }
@@ -126,7 +145,6 @@ public class PlayerController : MonoBehaviour
             right.Normalize();
 
             // Combine the input axes with the body directions to get final movement
-            // moveInput.y = forward/back input, moveInput.x = left/right input
             moveDirection = forward * moveInput.y + right * moveInput.x;
         }
         else
@@ -166,22 +184,15 @@ public class PlayerController : MonoBehaviour
             // Only rotate if there's a valid direction (avoids math errors with zero vectors)
             if (lookDirection != Vector3.zero)
             {
-                // LookRotation converts a direction vector into a rotation value
                 Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
-
-                // Slerp smoothly transitions between two rotations - the 10f controls speed
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 10f);
             }
 
-            // Just make the particle face the exact same direction the camera is looking!
             shootParticle.transform.forward = Camera.main.transform.forward;
         }
         else if (moveInput != Vector2.zero)
         {
-            // Rotate the player to face their movement direction
             Quaternion toRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-
-            // Smoothly rotate toward the running direction using our rotationSpeed setting
             transform.rotation = Quaternion.Slerp(transform.rotation, toRotation, rotationSpeed * Time.deltaTime);
         }
 
@@ -194,26 +205,26 @@ public class PlayerController : MonoBehaviour
 
     public void OnMove(InputAction.CallbackContext context)
     {
-        // ReadValue pulls the raw 2D coordinates from the input and stores them
+        // 2. Removed Time.timeScale check so releasing keys while paused updates moveInput to zero!
         moveInput = context.ReadValue<Vector2>();
     }
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-
+        // 2. Removed Time.timeScale check so releasing Shift while paused updates isSprinting to false!
         if (context.started) isSprinting = true;
-        else if
-        (context.canceled) isSprinting = false;
+        else if (context.canceled) isSprinting = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
+        if (Time.timeScale == 0f)
+            return;
 
         if (context.performed && controller.isGrounded)
         {
             jumpParticle.Play();
             audioSource.PlayOneShot(jumpSound);
-            // Calculates exactly how much upward force is needed to reach our target jumpHeight before gravity pulls down
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
@@ -225,16 +236,12 @@ public class PlayerController : MonoBehaviour
 
         if (context.performed && isAiming && canShoot)
         {
-            // Lock the gate immediately so spam-clicking can't fire multiple bullets
             canShoot = false;
-
-            // Create a copy of the bullet prefab at the barrel position with the player's rotation
             GameObject bulletShot = Instantiate(bullet, bulletpoint.transform.position, transform.rotation);
 
             shootParticle.Play();
             audioSource.PlayOneShot(pewpewSound);
 
-            // Schedule ResetShoot to run after the cooldown delay (in seconds)
             Invoke("ResetShoot", bulletCoolDown);
         }
     }

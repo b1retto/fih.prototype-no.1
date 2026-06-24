@@ -5,9 +5,11 @@ using UnityEngine.SceneManagement;
 
 public class UIManager : MonoBehaviour
 {
-    [SerializeField] private GameObject startMenuUI;
-    [SerializeField] private GameObject pauseUI;
-    [SerializeField] private GameObject controlsUI;
+    public GameObject startMenuUI;
+    public GameObject pauseUI;
+    public GameObject controlsUI;
+    public GameObject healthBarUI;
+
     [SerializeField] private WorldCrossHairController crosshairController;
     [SerializeField] private CinemachineInputAxisController cameraAxisController;
     [SerializeField] private AimCameraController aimCameraController;
@@ -20,6 +22,7 @@ public class UIManager : MonoBehaviour
         startMenuUI.SetActive(true);
         pauseUI.SetActive(false);
         controlsUI.SetActive(false);
+        healthBarUI.SetActive(false);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
@@ -35,11 +38,11 @@ public class UIManager : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.BackQuote))
         {
-            if (!hasStarted)
-                return;
+            if (!hasStarted) return;
 
             if (!pauseUI.activeSelf)
             {
+                if (Time.timeScale == 0f) return;
                 onPausePress();
             }
             else
@@ -55,6 +58,7 @@ public class UIManager : MonoBehaviour
         hasStarted = true;
         startMenuUI.SetActive(false);
         controlsUI.SetActive(true);
+        healthBarUI.SetActive(true);
 
         if (crosshairController != null)
         {
@@ -73,6 +77,7 @@ public class UIManager : MonoBehaviour
     {
         pauseUI.SetActive(true);
         controlsUI.SetActive(false);
+        healthBarUI.SetActive(false);
 
         if (crosshairController != null)
         {
@@ -92,6 +97,7 @@ public class UIManager : MonoBehaviour
     {
         pauseUI.SetActive(false);
         controlsUI.SetActive(true);
+        healthBarUI.SetActive(true);
 
         if (crosshairController != null)
         {
@@ -114,6 +120,7 @@ public class UIManager : MonoBehaviour
         startMenuUI.SetActive(true);
         pauseUI.SetActive(false);
         controlsUI.SetActive(false);
+        healthBarUI.SetActive(false);
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
