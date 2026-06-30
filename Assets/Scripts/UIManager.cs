@@ -5,7 +5,10 @@ using UnityEngine.SceneManagement;
 public class UIManager : MonoBehaviour
 {
     [Header("UI Panels")]
-    public GameObject startMenuUI, pauseUI, controlsUI;
+    public GameObject startMenuUI, pauseUI, controlsUI, healthBarUI;
+
+    [SerializeField] private PlayerController playerController;
+    [SerializeField] private WorldCrossHairController worldCrossHairController;
 
     [Header("Controllers")]
     [SerializeField] private WorldCrossHairController crosshairController;
@@ -14,7 +17,7 @@ public class UIManager : MonoBehaviour
 
     private bool hasStarted;
 
-    void Start() => ToggleState(start: true, pause: false, controls: false, active: false);
+    void Start() => ToggleState(start: true, pause: false, controls: false, healthBar: false, active: false);
 
     void Update()
     {
@@ -24,10 +27,17 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    public void OnStartPress() => ToggleState(start: false, pause: false, controls: true, active: true);
-    public void onPausePress() => ToggleState(start: false, pause: true, controls: false, active: false);
-    public void OnResumePress() => ToggleState(start: false, pause: false, controls: true, active: true);
-    public void OnReturnPress() => ToggleState(start: true, pause: false, controls: false, active: false);
+    public void OnStartPress() => ToggleState(start: false, pause: false, controls: true, healthBar: true, active: true);
+    public void onPausePress() => ToggleState(start: false, pause: true, controls: false, healthBar: false, active: false);
+    public void OnResumePress()
+    {
+        ToggleState(start: false, pause: false, controls: true, healthBar: true, active: true);
+        if (!playerController.isAiming)
+        {
+            worldCrossHairController.SetCrosshairVisibility(false);
+        }
+    }
+    public void OnReturnPress() => ToggleState(start: true, pause: false, controls: false, healthBar: false, active: false);
 
     public void OnExitPress()
     {
@@ -42,12 +52,13 @@ public class UIManager : MonoBehaviour
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-    private void ToggleState(bool start, bool pause, bool controls, bool active)
+    private void ToggleState(bool start, bool pause, bool controls, bool healthBar, bool active)
     {
         hasStarted = !start;
         startMenuUI.SetActive(start);
         pauseUI.SetActive(pause);
         controlsUI.SetActive(controls);
+        healthBarUI.SetActive(healthBar);
 
         Cursor.visible = !active;
         Cursor.lockState = active ? CursorLockMode.Locked : CursorLockMode.None;

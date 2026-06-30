@@ -42,25 +42,22 @@ public class HealthBarScript : MonoBehaviour
 
     public void GameOver()
     {
-        if (gameOverScene.activeSelf == false)
-        {
-            Cursor.visible = true;
-            Cursor.lockState = CursorLockMode.None;
+        if (gameOverScene.activeSelf == true) return;
 
-            Time.timeScale = 0f;
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
 
-            gameOverScene.SetActive(true);
-            mainCamera.SetActive(false);
-
-            gameObject.SetActive(false);
-            uiManager.controlsUI.SetActive(false);
-
-            Invoke("DisablePlayerController", 0.01f);
-        }
-    }
-
-    void DisablePlayerController()
-    {
         playerController.enabled = false;
+
+        AudioListener.pause = true;
+
+        Time.timeScale = 0f;
+
+        gameOverScene.SetActive(true);
+        mainCamera.SetActive(false);
+        uiManager.controlsUI.SetActive(false);
+
+        gameObject.SetActive(false);
     }
+
 }

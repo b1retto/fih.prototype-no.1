@@ -6642,7 +6642,6 @@ MonoBehaviour:
   aimCam: {fileID: 1562939086}
   inputAxisController: {fileID: 825066488}
   player: {fileID: 684390518}
-  crosshairUI: {fileID: 2074026624}
   crosshairController: {fileID: 2074026628}
 --- !u!4 &628078065
 Transform:
@@ -8098,10 +8097,11 @@ MonoBehaviour:
   pauseUI: {fileID: 5769770}
   controlsUI: {fileID: 1635529916}
   healthBarUI: {fileID: 1274968373}
+  playerController: {fileID: 684390518}
+  worldCrossHairController: {fileID: 2074026628}
   crosshairController: {fileID: 2074026628}
   cameraAxisController: {fileID: 825066488}
   aimCameraController: {fileID: 1562939088}
-  cameraSwitcher: {fileID: 0}
 --- !u!1 &880219326
 GameObject:
   m_ObjectHideFlags: 0
@@ -17106,7 +17106,7 @@ ParticleSystem:
   emitterVelocityMode: 1
   looping: 1
   prewarm: 0
-  playOnAwake: 1
+  playOnAwake: 0
   useUnscaledTime: 0
   autoRandomSeed: 1
   startDelay:
@@ -22270,7 +22270,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &2074026625
 RectTransform:
   m_ObjectHideFlags: 0
@@ -22341,7 +22341,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::WorldCrossHairController
   crosshairUI: {fileID: 2074026625}
-  uiManager: {fileID: 867459603}
   aimCamera: {fileID: 330585545}
   maxDistance: 20
   raycastMask:

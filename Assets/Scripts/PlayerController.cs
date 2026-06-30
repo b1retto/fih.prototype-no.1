@@ -12,23 +12,18 @@ public class PlayerController : MonoBehaviour
     public int currentHealth;
     public HealthBarScript healthBar;
     private bool canShoot = true;
+    private bool jumped = false;
 
     [Header("Jump Settings")]
     [SerializeField] private float jumpHeight = 2f;
     [SerializeField] private float gravity = -9.8f;
 
     [Header("References")]
-    [SerializeField] private Transform cameraTransform;
-    [SerializeField] private Transform yawTarget;
-    [SerializeField] private GameObject bullet;
-    [SerializeField] private GameObject bulletpoint;
-    [SerializeField] private ParticleSystem jumpParticle;
-    [SerializeField] private ParticleSystem runParticle;
-    [SerializeField] private ParticleSystem shootParticle;
-    [SerializeField] private AudioClip pewpewSound;
-    [SerializeField] private AudioClip jumpSound;
-    [SerializeField] private AudioClip runningSound;
-    [SerializeField] private AudioClip walkingSound;
+    [SerializeField] private Transform cameraTransform, yawTarget;
+    [SerializeField] private GameObject bullet, bulletpoint;
+    [SerializeField] private ParticleSystem jumpParticle, runParticle, shootParticle;
+    [SerializeField] private AudioClip pewpewSound, jumpSound, runningSound, walkingSound;
+
     public AudioSource audioSource;
 
     private CharacterController controller;
@@ -47,60 +42,6 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (Time.timeScale == 0f)
-        {
-            if (runParticle.isPlaying) runParticle.Stop();
-            if (audioSource.isPlaying && (audioSource.clip == runningSound || audioSource.clip == walkingSound))
-            {
-                audioSource.Stop();
-                audioSource.clip = null;
-                audioSource.loop = false;
-            }
-            return;
-        }
-
-        if (Input.GetKeyDown(KeyCode.B)) TakeDamage(20);
-
-        if (controller.isGrounded && isSprinting && moveInput != Vector2.zero)
-        {
-            if (!runParticle.isPlaying || audioSource.clip != runningSound)
-            {
-                runParticle.Play();
-                audioSource.clip = runningSound;
-                audioSource.loop = true;
-                audioSource.Play();
-            }
-        }
-        else
-        {
-            if (runParticle.isPlaying) runParticle.Stop();
-            if (audioSource.clip == runningSound)
-            {
-                audioSource.Stop();
-                audioSource.clip = null;
-                audioSource.loop = false;
-            }
-        }
-
-        if (controller.isGrounded && !isSprinting && moveInput != Vector2.zero)
-        {
-            if (!audioSource.isPlaying || audioSource.clip != walkingSound)
-            {
-                audioSource.clip = walkingSound;
-                audioSource.loop = true;
-                audioSource.Play();
-            }
-        }
-        else
-        {
-            if (audioSource.clip == walkingSound)
-            {
-                audioSource.Stop();
-                audioSource.clip = null;
-                audioSource.loop = false;
-            }
-        }
-
         if (controller.isGrounded && velocity.y < 0) velocity.y = -2f;
 
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
@@ -139,6 +80,56 @@ public class PlayerController : MonoBehaviour
 
         velocity.y += gravity * Time.deltaTime;
         controller.Move(velocity * Time.deltaTime);
+
+        if (Time.timeScale == 0f)
+        {
+            audioSource.Stop();
+            if (audioSource.clip == walkingSound || audioSource.clip == runningSound)
+            {
+                audioSource.clip = null;
+            }
+            if (runParticle.isPlaying) runParticle.Stop();
+        }
+        else if (controller.isGrounded && moveInput != Vector2.zero)
+        {
+            AudioClip targetClip = isSprinting ? runningSound : walkingSound;
+            if (audioSource.clip != targetClip)
+            {
+                audioSource.clip = targetClip;
+                audioSource.loop = true;
+                audioSource.Play();
+            }
+            if (isSprinting && !runParticle.isPlaying) runParticle.Play();
+            if (!isSprinting && runParticle.isPlaying) runParticle.Stop();
+        }
+        else if (!controller.isGrounded || moveInput == Vector2.zero)
+        {
+            if (audioSource.clip == walkingSound || audioSource.clip == runningSound)
+            {
+                audioSource.Stop();
+                audioSource.clip = null;
+            }
+
+            if (jumped && !controller.isGrounded)
+            {
+                jumped = false;
+                audioSource.PlayOneShot(jumpSound);
+            }
+
+            if (runParticle.isPlaying) runParticle.Stop();
+        }
+    }
+
+    void OnDisable()
+    {
+        moveInput = Vector2.zero;
+        if (runParticle.isPlaying) runParticle.Stop();
+        if (audioSource.isPlaying && (audioSource.clip == runningSound || audioSource.clip == walkingSound))
+        {
+            audioSource.loop = false;
+            audioSource.clip = null;
+            audioSource.Stop();
+        }
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -155,10 +146,11 @@ public class PlayerController : MonoBehaviour
     public void OnJump(InputAction.CallbackContext context)
     {
         if (Time.timeScale == 0f) return;
+
         if (context.performed && controller.isGrounded)
         {
+            jumped = true;
             jumpParticle.Play();
-            AudioSource.PlayClipAtPoint(jumpSound, transform.position);
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
@@ -166,15 +158,19 @@ public class PlayerController : MonoBehaviour
     public void OnShoot(InputAction.CallbackContext context)
     {
         if (Time.timeScale == 0f) return;
+
         if (context.performed && isAiming && canShoot)
         {
             canShoot = false;
+
             Instantiate(bullet, bulletpoint.transform.position, transform.rotation);
-            shootParticle.Play();
+
             audioSource.PlayOneShot(pewpewSound);
+
             Invoke(nameof(ResetShoot), bulletCoolDown);
         }
     }
+
 
     void TakeDamage(int damage)
     {
