@@ -1,3 +1,4 @@
+using System.Data.Common;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -171,6 +172,15 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        DamageScript damagePart = hit.gameObject.GetComponent<DamageScript>();
+
+        if (damagePart != null)
+        {
+            damagePart.ExecuteDamage(this);
+        }
+    }
 
     public void TakeDamage(int damage)
     {
