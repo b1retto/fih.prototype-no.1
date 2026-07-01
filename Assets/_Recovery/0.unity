@@ -9727,7 +9727,6 @@ MonoBehaviour:
   mainCamera: {fileID: 330585543}
   playerController: {fileID: 684390518}
   uiManager: {fileID: 867459603}
-  gameOverVideo: {fileID: 310791979}
 --- !u!114 &1274968376
 MonoBehaviour:
   m_ObjectHideFlags: 0

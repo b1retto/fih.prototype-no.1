@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UI;
+using UnityEngine.Video; // REQUIRED: Added for VideoPlayer control
 
 public class HealthBarScript : MonoBehaviour
 {
@@ -8,11 +9,10 @@ public class HealthBarScript : MonoBehaviour
     public Gradient gradient;
     public Image fill;
 
-    [SerializeField] private GameObject gameOverScene;
-    [SerializeField] private GameObject mainCamera;
+    [SerializeField] private GameObject gameOverScene, mainCamera;
     [SerializeField] private PlayerController playerController;
-
     [SerializeField] private UIManager uiManager;
+    [SerializeField] private VideoPlayer gameOverVideo;
 
     void Start()
     {
@@ -24,17 +24,15 @@ public class HealthBarScript : MonoBehaviour
     {
         slider.maxValue = health;
         slider.value = health;
-
         fill.color = gradient.Evaluate(1f);
     }
 
     public void SetHealth(int health)
     {
         slider.value = health;
-
         fill.color = gradient.Evaluate(slider.normalizedValue);
 
-        if (slider.value == 0)
+        if (slider.value <= 0)
         {
             GameOver();
         }
@@ -42,22 +40,25 @@ public class HealthBarScript : MonoBehaviour
 
     public void GameOver()
     {
-        if (gameOverScene.activeSelf == true) return;
+        if (gameOverScene.activeSelf) return;
 
         Cursor.visible = true;
         Cursor.lockState = CursorLockMode.None;
 
         playerController.enabled = false;
 
-        AudioListener.pause = true;
-
         Time.timeScale = 0f;
 
+        if (gameOverVideo != null)
+        {
+            gameOverVideo.timeUpdateMode = VideoTimeUpdateMode.UnscaledGameTime;
+            gameOverVideo.Play();
+        }
+
         gameOverScene.SetActive(true);
-        mainCamera.SetActive(false);
         uiManager.controlsUI.SetActive(false);
+        mainCamera.SetActive(false);
 
         gameObject.SetActive(false);
     }
-
 }
