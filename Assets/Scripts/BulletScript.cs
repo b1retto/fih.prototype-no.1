@@ -3,37 +3,42 @@ using UnityEngine;
 public class BulletScript : MonoBehaviour
 {
     [SerializeField] private float speed = 10f;
-    [SerializeField] private float bulletRotationSpeed = 60f;
+    [SerializeField] private float bulletRotationSpeed = 3600f;
 
-    private Vector3 lockedTargetLocation;
+    [SerializeField] private float overshootDistance = 5f;
+
+    private Vector3 finalDestroyPoint;
 
     void Start()
     {
         var crosshair = GameObject.Find("crosshair");
-        if (crosshair && crosshair.TryGetComponent(out WorldCrossHairController crossHairScript))
+
+        if (crosshair != null)
         {
-            lockedTargetLocation = crossHairScript.transform.position;
+            Vector3 crosshairPos = crosshair.transform.position;
+
+            Vector3 directionToCrosshair = (crosshairPos - transform.position).normalized;
+
+            float distanceToCrosshair = Vector3.Distance(transform.position, crosshairPos);
+            float totalDistance = distanceToCrosshair + overshootDistance;
+
+            finalDestroyPoint = transform.position + (directionToCrosshair * totalDistance);
         }
         else
         {
-            lockedTargetLocation = transform.position + transform.forward * 100f;
+            Vector3 direction = transform.forward;
+            float totalDistance = 100f + overshootDistance;
+            finalDestroyPoint = transform.position + (direction * totalDistance);
         }
     }
 
     void Update()
     {
-        transform.position = Vector3.MoveTowards(transform.position, lockedTargetLocation, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, finalDestroyPoint, speed * Time.deltaTime);
+
         transform.Rotate(0f, bulletRotationSpeed * Time.deltaTime, 0f);
 
-        if (transform.position == lockedTargetLocation)
-        {
-            Destroy(gameObject);
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (!other.CompareTag("Player"))
+        if (Vector3.Distance(transform.position, finalDestroyPoint) < 0.1f)
         {
             Destroy(gameObject);
         }

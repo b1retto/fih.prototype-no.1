@@ -8,10 +8,10 @@ public class UIManager : MonoBehaviour
     public GameObject startMenuUI, pauseUI, controlsUI, healthBarUI;
 
     [SerializeField] private PlayerController playerController;
-    [SerializeField] private WorldCrossHairController worldCrossHairController;
+    [SerializeField] private WorldCrosshairController worldCrossHairController;
 
     [Header("Controllers")]
-    [SerializeField] private WorldCrossHairController crosshairController;
+    [SerializeField] private WorldCrosshairController crosshairController;
     [SerializeField] private CinemachineInputAxisController cameraAxisController;
     [SerializeField] private AimCameraController aimCameraController;
 

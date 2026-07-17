@@ -11,7 +11,7 @@ public class CameraSwitcher : MonoBehaviour
 
     [Header("References")]
     [SerializeField] private PlayerController player;
-    [SerializeField] private WorldCrossHairController crosshairController;
+    [SerializeField] private WorldCrosshairController crosshairController;
 
     private PlayerActions input;
     private InputAction aimAction;

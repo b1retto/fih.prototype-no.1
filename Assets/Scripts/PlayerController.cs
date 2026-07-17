@@ -20,10 +20,12 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -9.8f;
 
     [Header("References")]
-    [SerializeField] private Transform cameraTransform, yawTarget;
+    [SerializeField] private Transform cameraTransform, yawTarget, crosshairTransform;
     [SerializeField] private GameObject bullet, bulletpoint;
     [SerializeField] private ParticleSystem jumpParticle, runParticle, shootParticle;
     [SerializeField] private AudioClip pewpewSound, jumpSound, runningSound, walkingSound;
+
+    public GameObject cucumber;
 
     public AudioSource audioSource;
 
@@ -43,6 +45,16 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetKeyDown(KeyCode.C))
+        {
+            if (cucumber != null)
+            {
+                Vector3 spawnPos = crosshairTransform.position;
+
+                Instantiate(cucumber, spawnPos, cucumber.transform.rotation);
+            }
+        }
+
         if (controller.isGrounded && velocity.y < 0) velocity.y = -2f;
 
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
