@@ -1,6 +1,6 @@
-using System.Data.Common;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using System;
 
 public class PlayerController : MonoBehaviour
 {
@@ -20,14 +20,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float gravity = -9.8f;
 
     [Header("References")]
-    [SerializeField] private Transform cameraTransform, yawTarget, crosshairTransform;
+    [SerializeField] private Transform cameraTransform, yawTarget;
+    [SerializeField] private Transform crosshairTransform;
     [SerializeField] private GameObject bullet, bulletpoint;
     [SerializeField] private ParticleSystem jumpParticle, runParticle, shootParticle;
-    [SerializeField] private AudioClip pewpewSound, jumpSound, runningSound, walkingSound;
+    [SerializeField] private AudioClip pewpewSound, jumpSound, runningSound, walkingSound, hurtSound;
 
     public GameObject cucumber;
-
-    public AudioSource audioSource;
+    public AudioSource audioSource, audioSource2;
 
     private CharacterController controller;
     private Vector2 moveInput;
@@ -40,22 +40,27 @@ public class PlayerController : MonoBehaviour
     {
         controller = GetComponent<CharacterController>();
         currentHealth = maxHealth;
-        healthBar.SetMaxHealth(maxHealth);
+
+        if (healthBar != null)
+            healthBar.SetMaxHealth(maxHealth);
+
+        if (crosshairTransform == null && Camera.main != null)
+            crosshairTransform = Camera.main.transform;
     }
 
     void Update()
     {
         if (Input.GetKeyDown(KeyCode.C))
         {
-            if (cucumber != null)
+            if (cucumber != null && crosshairTransform != null)
             {
                 Vector3 spawnPos = crosshairTransform.position;
-
                 Instantiate(cucumber, spawnPos, cucumber.transform.rotation);
             }
         }
 
-        if (controller.isGrounded && velocity.y < 0) velocity.y = -2f;
+        if (controller.isGrounded && velocity.y < 0)
+            velocity.y = -2f;
 
         float currentSpeed = isSprinting ? sprintSpeed : walkSpeed;
 
@@ -69,7 +74,8 @@ public class PlayerController : MonoBehaviour
 
         Vector3 moveDirection = forward * moveInput.y + right * moveInput.x;
 
-        if (moveDirection != Vector3.zero) runParticle.transform.forward = -moveDirection.normalized;
+        if (moveDirection != Vector3.zero && !isAiming)
+            runParticle.transform.forward = -moveDirection.normalized;
 
         controller.Move(moveDirection * currentSpeed * Time.deltaTime);
 
@@ -96,14 +102,16 @@ public class PlayerController : MonoBehaviour
 
         if (Time.timeScale == 0f)
         {
-            audioSource.Stop();
-            if (audioSource.clip == walkingSound || audioSource.clip == runningSound)
+            if (audioSource != null)
             {
-                audioSource.clip = null;
+                audioSource.Stop();
+                if (audioSource.clip == walkingSound || audioSource.clip == runningSound)
+                    audioSource.clip = null;
             }
-            if (runParticle.isPlaying) runParticle.Stop();
+            if (runParticle != null && runParticle.isPlaying)
+                runParticle.Stop();
         }
-        else if (controller.isGrounded && moveInput != Vector2.zero)
+        else if (controller.isGrounded && moveInput != Vector2.zero && audioSource != null)
         {
             AudioClip targetClip = isSprinting ? runningSound : walkingSound;
             if (audioSource.clip != targetClip)
@@ -112,10 +120,12 @@ public class PlayerController : MonoBehaviour
                 audioSource.loop = true;
                 audioSource.Play();
             }
-            if (isSprinting && !runParticle.isPlaying) runParticle.Play();
-            if (!isSprinting && runParticle.isPlaying) runParticle.Stop();
+            if (isSprinting && runParticle != null && !runParticle.isPlaying)
+                runParticle.Play();
+            if (!isSprinting && runParticle != null && runParticle.isPlaying)
+                runParticle.Stop();
         }
-        else if (!controller.isGrounded || moveInput == Vector2.zero)
+        else if ((!controller.isGrounded || moveInput == Vector2.zero) && audioSource != null)
         {
             if (audioSource.clip == walkingSound || audioSource.clip == runningSound)
             {
@@ -129,15 +139,19 @@ public class PlayerController : MonoBehaviour
                 audioSource.PlayOneShot(jumpSound);
             }
 
-            if (runParticle.isPlaying) runParticle.Stop();
+            if (runParticle != null && runParticle.isPlaying)
+                runParticle.Stop();
         }
     }
 
     void OnDisable()
     {
         moveInput = Vector2.zero;
-        if (runParticle.isPlaying) runParticle.Stop();
-        if (audioSource.isPlaying && (audioSource.clip == runningSound || audioSource.clip == walkingSound))
+        if (runParticle != null && runParticle.isPlaying)
+            runParticle.Stop();
+
+        if (audioSource != null && audioSource.isPlaying &&
+            (audioSource.clip == runningSound || audioSource.clip == walkingSound))
         {
             audioSource.loop = false;
             audioSource.clip = null;
@@ -152,52 +166,75 @@ public class PlayerController : MonoBehaviour
 
     public void OnSprint(InputAction.CallbackContext context)
     {
-        if (context.started) isSprinting = true;
-        else if (context.canceled) isSprinting = false;
+        if (context.started)
+            isSprinting = true;
+        else if (context.canceled)
+            isSprinting = false;
     }
 
     public void OnJump(InputAction.CallbackContext context)
     {
-        if (Time.timeScale == 0f) return;
+        if (Time.timeScale == 0f)
+            return;
 
         if (context.performed && controller.isGrounded)
         {
             jumped = true;
-            jumpParticle.Play();
+            if (jumpParticle != null)
+                jumpParticle.Play();
             velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
         }
     }
 
     public void OnShoot(InputAction.CallbackContext context)
     {
-        if (Time.timeScale == 0f) return;
+        if (Time.timeScale == 0f)
+            return;
 
-        if (context.performed && isAiming && canShoot)
+        if (context.performed && isAiming && canShoot && bullet != null && bulletpoint != null)
         {
             canShoot = false;
-
             Instantiate(bullet, bulletpoint.transform.position, transform.rotation);
 
-            audioSource.PlayOneShot(pewpewSound);
+            if (pewpewSound != null && audioSource != null)
+                audioSource.PlayOneShot(pewpewSound);
 
-            Invoke(nameof(ResetShoot), bulletCoolDown);
+            if (bulletCoolDown > 0f)
+                Invoke(nameof(ResetShoot), bulletCoolDown);
         }
     }
 
     void OnControllerColliderHit(ControllerColliderHit hit)
     {
+        if (Time.timeScale == 0)
+        {
+            if (audioSource2 != null)
+            {
+                audioSource2.Stop();
+                audioSource2.clip = null;
+            }
+            return;
+        }
+
         DamageScript damagePart = hit.gameObject.GetComponent<DamageScript>();
 
         if (damagePart != null)
         {
-            damagePart.ExecuteDamage(this);
+            int damageAmount = damagePart.ExecuteDamage(this);
+
+            if (damageAmount > 0 && hurtSound != null && audioSource2 != null)
+            {
+                audioSource2.clip = hurtSound;
+                audioSource2.Play();
+            }
         }
     }
-
-    public void TakeDamage(int damage)
+    public int TakeDamage(int damage)
     {
         currentHealth -= damage;
-        healthBar.SetHealth(currentHealth);
+        if (healthBar != null)
+            healthBar.SetHealth(currentHealth);
+        return damage;
     }
 
     void ResetShoot() => canShoot = true;
