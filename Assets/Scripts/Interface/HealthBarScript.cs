@@ -14,6 +14,8 @@ public class HealthBarScript : MonoBehaviour
     [SerializeField] private UIManager uiManager;
     [SerializeField] private VideoPlayer gameOverVideo;
 
+    bool isDead = false;
+
     void Start()
     {
         gameOverScene.SetActive(false);
@@ -40,6 +42,7 @@ public class HealthBarScript : MonoBehaviour
 
     public void GameOver()
     {
+        isDead = true;
         if (gameOverScene.activeSelf) return;
 
         Cursor.visible = true;
@@ -61,4 +64,6 @@ public class HealthBarScript : MonoBehaviour
 
         gameObject.SetActive(false);
     }
+
+    public bool dead => isDead;
 }

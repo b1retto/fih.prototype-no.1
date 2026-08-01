@@ -8397,6 +8397,7 @@ MonoBehaviour:
   healthBarUI: {fileID: 1274968373}
   playerController: {fileID: 684390518}
   worldCrossHairController: {fileID: 2074026628}
+  healthBarScript: {fileID: 1274968375}
   crosshairController: {fileID: 2074026628}
   cameraAxisController: {fileID: 825066488}
   aimCameraController: {fileID: 1562939088}

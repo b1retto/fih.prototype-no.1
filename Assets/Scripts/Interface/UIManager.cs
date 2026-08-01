@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
 
     [SerializeField] private PlayerController playerController;
     [SerializeField] private WorldCrosshairController worldCrossHairController;
+    [SerializeField] private HealthBarScript healthBarScript;
 
     [Header("Controllers")]
     [SerializeField] private WorldCrosshairController crosshairController;
@@ -21,7 +22,7 @@ public class UIManager : MonoBehaviour
 
     void Update()
     {
-        if (hasStarted && Input.GetKeyDown(KeyCode.BackQuote))
+        if (hasStarted && !healthBarScript.dead && Input.GetKeyDown(KeyCode.BackQuote))
         {
             if (pauseUI.activeSelf) OnResumePress(); else onPausePress();
         }
